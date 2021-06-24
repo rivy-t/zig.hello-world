@@ -48,6 +48,9 @@ pub fn build(b: *std.build.Builder) void {
     log.debug("dest_dir = '{s}'", .{ b.dest_dir });
     log.debug("exe_dir = '{s}'", .{ b.exe_dir });
     log.debug("lib_dir = '{s}'", .{ b.lib_dir });
+    log.debug("zig_exe = '{s}'", .{ b.zig_exe });
+    log.debug("@src = '{s}'", .{ @src().file });
+
 
     // const cwd = std.fs.cwd().realpathAlloc(b.allocator, ".");
     // const p_root = std.fs.cwd().realpathAlloc(b.allocator, b.build_root);
@@ -95,6 +98,12 @@ pub fn build(b: *std.build.Builder) void {
 
     // "clean"
     const clean = b.step("clean", fmt("Remove project artifacts (cached in '{s}')", .{ p_cache_rel }));
+    // build step is executed from zig-cache blocking removal
+    // const clean_cache = b.addRemoveDirTree(p_cache_rel);
+    // clean.dependOn(&clean_cache.step);
+    // ToDO: remove only if p_install is sub-directory of p_root (or maybe CWD?)
+    clean.dependOn(&b.addRemoveDirTree(p_install).step);
+
 
     // "compile"
     // var compile = b.step("compile", std.fmt.allocPrint(allocator, "Compile project (cached in '{s}')", .{ b.cache_root }) catch unreachable);
@@ -122,4 +131,25 @@ pub fn build(b: *std.build.Builder) void {
     run.dependOn(&run_cmd.step);
 
     b.default_step = run;
+
+    // from 'zig-examples'
+    // buildSimple(builder, "all");
+    // buildSimple(builder, "allocators");
+    // buildSimple(builder, "booleans");
+    // buildSimple(builder, "c_interop");
+    // buildSimple(builder, "control_flow");
+    // buildSimple(builder, "coroutines");
+    // buildSimple(builder, "embed");
+    // buildSimple(builder, "enums");
+    // buildSimple(builder, "floats");
+    // buildSimple(builder, "hello");
+    // buildSimple(builder, "integers");
+    // buildSimple(builder, "optionals");
+    // buildSimple(builder, "random");
+    // buildSimple(builder, "strings");
+    // buildSimple(builder, "structs");
+    // buildSimple(builder, "time");
+    // buildSimple(builder, "threads");
+    // buildSimple(builder, "vectors");
+    // buildSimple(builder, "game");
 }
